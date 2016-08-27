@@ -1,8 +1,8 @@
 # ============================================================================
 # Medical Image Registration ToolKit (MIRTK)
 #
-# Copyright 2013-2015 Imperial College London
-# Copyright 2013-2015 Andreas Schuh
+# Copyright 2013-2016 Imperial College London
+# Copyright 2013-2016 Andreas Schuh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,45 +19,93 @@
 
 ##############################################################################
 # @file  CMakeLists.txt
-# @brief Build configuration of MIRTK VolumetricMapping library.
+# @brief Build configuration of MIRTK Mapping library.
 ##############################################################################
 
-set(HEADERS
-  mirtkAsConformalAsPossibleVolumeParameterizer.h
-  mirtkBiharmonicMap.h
-  mirtkDiscreteMap.h
-  mirtkFundamentalMap.h
-  mirtkFundamentalVolumeParameterizer.h
-  mirtkHarmonicFundamentalVolumeParameterizer.h
-  mirtkHarmonicMap.h
-  mirtkHarmonicTetrahedralVolumeParameterizer.h
-  mirtkLinearTetrahedralVolumeParameterizer.h
-  mirtkTetrahedralVolumeParameterizer.h
-  mirtkVolumeParameterizer.h
-  mirtkVolumetricMap.h
+set(HEADERS ${BINARY_INCLUDE_DIR}/mirtk/${PROJECT_NAME}Export.h)
+set(SOURCES)
+
+# List of library classes where indentation reflects inheritance
+# Note: Header only classes must be included with the .h file name extension.
+set(CLASSES
+  # Map types
+  Mapping
+    MeshlessMap
+      MeshlessHarmonicMap
+        MeshlessBiharmonicMap
+    PiecewiseLinearMap
+  # Surface boundary parameterization
+  BoundarySegmentParameterizer
+    UniformBoundarySegmentParameterizer
+    ChordLengthBoundarySegmentParameterizer
+    SubdividedBoundarySegmentParameterizer
+  # Surface boundary mapping
+  BoundaryMapper
+    BoundarySegmentMapper
+      BoundaryToDiskMapper
+      BoundaryToPolygonMapper
+      BoundaryToSquareMapper
+  # Surface mapping
+  SurfaceMapper
+    FixedBoundarySurfaceMapper
+      LinearFixedBoundarySurfaceMapper
+        SymmetricWeightsSurfaceMapper
+          UniformSurfaceMapper
+          ChordLengthSurfaceMapper
+          HarmonicSurfaceMapper
+          AuthalicSurfaceMapper
+          IntrinsicSurfaceMapper
+            NearOptimalIntrinsicSurfaceMapper
+              IntrinsicLeastAreaDistortionSurfaceMapper
+              IntrinsicLeastEdgeLengthDistortionSurfaceMapper
+        NonSymmetricWeightsSurfaceMapper
+          ShapePreservingSurfaceMapper
+          MeanValueSurfaceMapper
+      #FlatSurfaceMapper
+      #  RegularGridSurfaceMapper
+      #    HarmonicRegularGridSurfaceMapper
+    FreeBoundarySurfaceMapper
+      LeastSquaresConformalSurfaceMapper
+    SphericalSurfaceMapper
+      ConformalSurfaceFlattening
+    #  SphericalMultiDimensionalScaling
+  # Volumetric mapping
+  VolumeMapper
+    TetrahedralMeshMapper
+      LinearTetrahedralMeshMapper
+        HarmonicTetrahedralMeshMapper
+        AsConformalAsPossibleMapper
+    MeshlessVolumeMapper
+      MeshlessHarmonicVolumeMapper
 )
 
-set(SOURCES
-  mirtkAsConformalAsPossibleVolumeParameterizer.cc
-  mirtkBiharmonicMap.cc
-  mirtkDiscreteMap.cc
-  mirtkFundamentalMap.cc
-  mirtkFundamentalVolumeParameterizer.cc
-  mirtkHarmonicFundamentalVolumeParameterizer.cc
-  mirtkHarmonicMap.cc
-  mirtkHarmonicTetrahedralVolumeParameterizer.cc
-  mirtkLinearTetrahedralVolumeParameterizer.cc
-  mirtkTetrahedralVolumeParameterizer.cc
-  mirtkVolumeParameterizer.cc
-  mirtkVolumetricMap.cc
-)
+if (MIRTK_Numerics_WITH_eigs)
+  list(APPEND CLASSES SpectralConformalSurfaceMapper)
+endif ()
 
+# Add source files implementing each class to HEADERS and SOURCES lists
+foreach (class IN LISTS CLASSES)
+  if (class MATCHES "\\.h$")
+    list(APPEND HEADERS ${class})
+  else ()
+    list(APPEND HEADERS ${class}.h)
+    list(APPEND SOURCES ${class}.cc)
+  endif ()
+endforeach ()
+
+# List of link dependencies
 set(DEPENDS
   LibCommon
   LibNumerics
   LibImage
   LibPointSet
+  LibIO
   ${VTK_LIBRARIES}
 )
 
+if (TARGET TBB::tbb)
+  list(APPEND DEPENDS TBB::tbb)
+endif ()
+
+# Add library target
 mirtk_add_library()

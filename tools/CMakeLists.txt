@@ -1,8 +1,8 @@
 # ============================================================================
 # Medical Image Registration ToolKit (MIRTK)
 #
-# Copyright 2013-2015 Imperial College London
-# Copyright 2013-2015 Andreas Schuh
+# Copyright 2015-2016 Imperial College London
+# Copyright 2015-2016 Andreas Schuh
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,23 @@
 
 ##############################################################################
 # @file  CMakeLists.txt
-# @brief Build configuration of MIRTK VolumetricMapping tools.
+# @brief Build configuration of MIRTK Mapping tools.
 ##############################################################################
 
-mirtk_add_executable(map DEPENDS LibVolumetricMapping ${VTK_LIBRARIES})
+macro(add_mapping_tool cmd)
+  mirtk_add_executable(${cmd} DEPENDS Lib${PROJECT_NAME} ${VTK_LIBRARIES})
+endmacro ()
+
+# Compute map
+add_mapping_tool(calculate-boundary-map)
+add_mapping_tool(calculate-surface-map)
+add_mapping_tool(calculate-volume-map)
+add_mapping_tool(compose-maps)
+
+# Evaluate map
+add_mapping_tool(evaluate-surface-map)
+add_mapping_tool(evaluate-volume-map)
+
+# Apply map
+#add_mapping_tool(map-surface)
+#add_mapping_tool(map-volume)

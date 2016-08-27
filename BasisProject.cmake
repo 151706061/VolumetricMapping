@@ -27,7 +27,7 @@
 # have to be specified here such that the top-level IRTK project can analyze the
 # inter-module dependencies, as well as dependencies on third-party libraries.
 #
-# @sa http://opensource.andreasschuh.com/cmake-basis/standard/modules.html
+# @sa https://cmake-basis.github.io/standard/modules.html
 #
 # @ingroup BasisSettings
 ################################################################################
@@ -42,12 +42,12 @@ basis_project (
 
   # ----------------------------------------------------------------------------
   # meta-data
-  NAME        "VolumetricMapping"
-  VERSION     "1.1.0" # version of this module
+  NAME        "Mapping"
+  VERSION     "0.0.0" # version of this module
   SOVERSION   "0"     # API yet unstable
   PACKAGE     "MIRTK"
   AUTHORS     "Andreas Schuh"
-  DESCRIPTION "Volumetric Mapping library of the Medical Image Registration ToolKit."
+  DESCRIPTION "Brain mapping library of the Medical Image Registration ToolKit."
   COPYRIGHT   "2013-2016 Imperial College London, Andreas Schuh"
   LICENSE     "Apache License Version 2.0"
   CONTACT     "Andreas Schuh <andreas.schuh.84@gmail.com>"
@@ -56,7 +56,8 @@ basis_project (
   # ----------------------------------------------------------------------------
   # dependencies
   DEPENDS
-    MIRTK{Common,Numerics,Image,PointSet}
+    MIRTK{Common,Numerics,Image,PointSet,IO}
+    Boost-1.48 # {math_c99} used, but headers only
     Eigen3
     "VTK-7|6{
       vtkCommonCore,
@@ -64,11 +65,12 @@ basis_project (
       vtkFiltersCore,
       vtkFiltersHybrid,
       vtkFiltersModeling,
-      vtkImagingCore
+      vtkImagingCore,
+      vtkIOXML
     }"
     #<dependency>
   OPTIONAL_DEPENDS
-    TBB
+    TBB{tbb}
     #<optional-dependency>
   TEST_DEPENDS
     #<test-dependency>
